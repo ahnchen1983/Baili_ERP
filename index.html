@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>百立 AI 餐飲進銷存</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* 自定義動畫 */
+        @keyframes pulse-red {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        .animate-pulse-red {
+            animation: pulse-red 2s infinite;
+        }
+        
+        /* 錄音按鈕動畫 */
+        .recording {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+            background-color: #ef4444;
+        }
+        
+        /* 底部導航欄固定 */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #e5e7eb;
+            z-index: 50;
+        }
+        
+        /* 主要內容區域留出底部空間 */
+        .main-content {
+            padding-bottom: 70px;
+        }
+        
+        /* 卡片陰影效果 */
+        .card-shadow {
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        }
+        
+        /* 語音波形動畫 */
+        .voice-wave {
+            display: inline-block;
+            width: 3px;
+            height: 20px;
+            margin: 0 2px;
+            background: #3b82f6;
+            animation: wave 1s ease-in-out infinite;
+        }
+        
+        .voice-wave:nth-child(2) { animation-delay: 0.1s; }
+        .voice-wave:nth-child(3) { animation-delay: 0.2s; }
+        .voice-wave:nth-child(4) { animation-delay: 0.3s; }
+        .voice-wave:nth-child(5) { animation-delay: 0.4s; }
+        
+        @keyframes wave {
+            0%, 100% { transform: scaleY(1); }
+            50% { transform: scaleY(2); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- 頂部標題列 -->
+    <div class="bg-blue-600 text-white p-4 sticky top-0 z-40">
+        <div class="flex items-center justify-between">
+            <div>
+                <h1 class="text-xl font-bold">百立 AI 進銷存</h1>
+                <p class="text-xs opacity-90">讓 AI 成為您的營運夥伴</p>
+            </div>
+            <div class="text-right">
+                <p class="text-sm">王小明餐廳</p>
+                <p class="text-xs opacity-90">2024/12/17</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 主要內容區 -->
+    <div class="main-content">
+        <!-- 首頁/儀表板 -->
+        <div id="dashboardPage" class="page">
+            <!-- 效期警示（最重要的放最上面） -->
+            <div class="m-4 bg-red-50 border-l-4 border-red-500 p-4 rounded-r animate-pulse-red">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="font-bold text-red-700 flex items-center">
+                            <i class="fas fa-exclamation-triangle mr-2"></i>
+                            效期警示
+                        </h3>
+                        <div class="mt-2 space-y-1 text-sm">
+                            <div class="flex justify-between">
+                                <span>🥬 高麗菜</span>
+                                <span class="text-red-600 font-bold">剩 2 天（3 箱）</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>🥩 豬肉</span>
+                                <span class="text-red-600 font-bold">剩 1 天（5 斤）</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-3xl">⏰</div>
+                </div>
+            </div>
+
+            <!-- 快速操作按鈕 -->
+            <div class="grid grid-cols-3 gap-3 px-4 mb-4">
+                <button onclick="showVoiceInput()" class="bg-blue-500 text-white p-4 rounded-lg card-shadow">
+                    <i class="fas fa-microphone text-2xl mb-2"></i>
+                    <p class="text-xs">語音進貨</p>
+                </button>
+                <button onclick="showPhotoInput()" class="bg-green-500 text-white p-4 rounded-lg card-shadow">
+                    <i class="fas fa-camera text-2xl mb-2"></i>
+                    <p class="text-xs">拍照進貨</p>
+                </button>
+                <button onclick="showManualInput()" class="bg-orange-500 text-white p-4 rounded-lg card-shadow">
+                    <i class="fas fa-keyboard text-2xl mb-2"></i>
+                    <p class="text-xs">手動輸入</p>
+                </button>
+            </div>
+
+            <!-- 今日數據卡片 -->
+            <div class="grid grid-cols-2 gap-4 px-4 mb-4">
+                <div class="bg-white p-4 rounded-lg card-shadow">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-500 text-sm">今日進貨</p>
+                            <p class="text-2xl font-bold text-blue-600">$12,580</p>
+                            <p class="text-xs text-green-600">↑ 15% vs 昨日</p>
+                        </div>
+                        <i class="fas fa-shopping-cart text-blue-200 text-3xl"></i>
+                    </div>
+                </div>
+                <div class="bg-white p-4 rounded-lg card-shadow">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-gray-500 text-sm">庫存價值</p>
+                            <p class="text-2xl font-bold text-green-600">$85,200</p>
+                            <p class="text-xs text-gray-500">152 項商品</p>
+                        </div>
+                        <i class="fas fa-warehouse text-green-200 text-3xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 最近進貨記錄 -->
+            <div class="px-4">
+                <h3 class="font-bold mb-3 text-gray-700">最近進貨</h3>
+                <div class="space-y-2">
+                    <div class="bg-white p-3 rounded-lg card-shadow flex justify-between items-center">
+                        <div class="flex items-center">
+                            <span class="text-2xl mr-3">🥬</span>
+                            <div>
+                                <p class="font-medium">高麗菜</p>
+                                <p class="text-xs text-gray-500">10:30 AM</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <p class="font-bold">5 箱</p>
+                            <p class="text-sm text-gray-500">$2,500</p>
+                        </div>
+                    </div>
+                    <div class="bg-white p-3 rounded-lg card-shadow flex justify-between items-center">
+                        <div class="flex items-center">
+                            <span class="text-2xl mr-3">🥩</span>
+                            <div>
+                                <p class="font-medium">豬肉</p>
+                                <p class="text-xs text-gray-500">09:15 AM</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <p class="font-bold">10 斤</p>
+                            <p class="text-sm text-gray-500">$1,200</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 進貨頁面 -->
+        <div id="inventoryPage" class="page hidden">
+            <!-- 進貨模式選擇 -->
+            <div class="p-4">
+                <div class="bg-white rounded-lg p-4 card-shadow">
+                    <h3 class="font-bold mb-4">選擇進貨方式</h3>
+                    <div class="space-y-3">
+                        <button onclick="showVoiceInput()" class="w-full flex items-center p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition">
+                            <i class="fas fa-microphone text-blue-600 text-2xl mr-4"></i>
+                            <div class="text-left">
+                                <p class="font-medium">語音進貨</p>
+                                <p class="text-sm text-gray-500">用說的最快速</p>
+                            </div>
+                        </button>
+                        <button onclick="showPhotoInput()" class="w-full flex items-center p-4 bg-green-50 rounded-lg hover:bg-green-100 transition">
+                            <i class="fas fa-camera text-green-600 text-2xl mr-4"></i>
+                            <div class="text-left">
+                                <p class="font-medium">拍照進貨</p>
+                                <p class="text-sm text-gray-500">拍送貨單即可</p>
+                            </div>
+                        </button>
+                        <button onclick="showManualInput()" class="w-full flex items-center p-4 bg-orange-50 rounded-lg hover:bg-orange-100 transition">
+                            <i class="fas fa-keyboard text-orange-600 text-2xl mr-4"></i>
+                            <div class="text-left">
+                                <p class="font-medium">手動輸入</p>
+                                <p class="text-sm text-gray-500">傳統輸入方式</p>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 今日進貨清單 -->
+                <div class="mt-4 bg-white rounded-lg p-4 card-shadow">
+                    <h3 class="font-bold mb-4">今日進貨清單</h3>
+                    <div class="space-y-2">
+                        <div class="flex justify-between py-2 border-b">
+                            <span>高麗菜</span>
+                            <span>5 箱</span>
+                            <span class="font-medium">$2,500</span>
+                        </div>
+                        <div class="flex justify-between py-2 border-b">
+                            <span>豬肉</span>
+                            <span>10 斤</span>
+                            <span class="font-medium">$1,200</span>
+                        </div>
+                        <div class="flex justify-between py-2 border-b">
+                            <span>雞蛋</span>
+                            <span>20 盒</span>
+                            <span class="font-medium">$1,600</span>
+                        </div>
+                    </div>
+                    <div class="mt-4 pt-4 border-t">
+                        <div class="flex justify-between font-bold text-lg">
+                            <span>總計</span>
+                            <span class="text-blue-600">$5,300</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 庫存頁面 -->
+        <div id="stockPage" class="page hidden">
+            <div class="p-4">
+                <!-- 搜尋框 -->
+                <div class="bg-white rounded-lg p-4 card-shadow mb-4">
+                    <div class="relative">
+                        <input type="text" placeholder="搜尋商品..." class="w-full p-3 pr-10 border rounded-lg">
+                        <i class="fas fa-search absolute right-3 top-4 text-gray-400"></i>
+                    </div>
+                    <!-- 分類標籤 -->
+                    <div class="flex gap-2 mt-3 overflow-x-auto">
+                        <span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm whitespace-nowrap">全部</span>
+                        <span class="px-3 py-1 bg-gray-100 rounded-full text-sm whitespace-nowrap">蔬菜類</span>
+                        <span class="px-3 py-1 bg-gray-100 rounded-full text-sm whitespace-nowrap">肉類</span>
+                        <span class="px-3 py-1 bg-gray-100 rounded-full text-sm whitespace-nowrap">調味料</span>
+                        <span class="px-3 py-1 bg-gray-100 rounded-full text-sm whitespace-nowrap">乾貨</span>
+                    </div>
+                </div>
+
+                <!-- 庫存清單 -->
+                <div class="space-y-3">
+                    <div class="bg-white rounded-lg p-4 card-shadow">
+                        <div class="flex justify-between items-start">
+                            <div class="flex-1">
+                                <h4 class="font-medium flex items-center">
+                                    <span class="text-xl mr-2">🥬</span>
+                                    高麗菜
+                                </h4>
+                                <div class="mt-2 text-sm text-gray-600">
+                                    <p>庫存：15 箱</p>
+                                    <p>平均成本：$500/箱</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <span class="px-2 py-1 bg-red-100 text-red-700 rounded text-xs">效期 2 天</span>
+                                <p class="mt-2 font-bold">$7,500</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg p-4 card-shadow">
+                        <div class="flex justify-between items-start">
+                            <div class="flex-1">
+                                <h4 class="font-medium flex items-center">
+                                    <span class="text-xl mr-2">🥩</span>
+                                    豬肉
+                                </h4>
+                                <div class="mt-2 text-sm text-gray-600">
+                                    <p>庫存：30 斤</p>
+                                    <p>平均成本：$120/斤</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <span class="px-2 py-1 bg-red-100 text-red-700 rounded text-xs">效期 1 天</span>
+                                <p class="mt-2 font-bold">$3,600</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg p-4 card-shadow">
+                        <div class="flex justify-between items-start">
+                            <div class="flex-1">
+                                <h4 class="font-medium flex items-center">
+                                    <span class="text-xl mr-2">🥚</span>
+                                    雞蛋
+                                </h4>
+                                <div class="mt-2 text-sm text-gray-600">
+                                    <p>庫存：50 盒</p>
+                                    <p>平均成本：$80/盒</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <span class="px-2 py-1 bg-yellow-100 text-yellow-700 rounded text-xs">效期 7 天</span>
+                                <p class="mt-2 font-bold">$4,000</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg p-4 card-shadow">
+                        <div class="flex justify-between items-start">
+                            <div class="flex-1">
+                                <h4 class="font-medium flex items-center">
+                                    <span class="text-xl mr-2">🍚</span>
+                                    白米
+                                </h4>
+                                <div class="mt-2 text-sm text-gray-600">
+                                    <p>庫存：20 包</p>
+                                    <p>平均成本：$600/包</p>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <span class="px-2 py-1 bg-green-100 text-green-700 rounded text-xs">效期 30 天</span>
+                                <p class="mt-2 font-bold">$12,000</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 庫存統計 -->
+                <div class="mt-4 bg-blue-50 rounded-lg p-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <p class="text-sm text-gray-600">總庫存價值</p>
+                            <p class="text-xl font-bold text-blue-600">$85,200</p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-600">需關注品項</p>
+                            <p class="text-xl font-bold text-red-600">5 項</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 報表頁面 -->
+        <div id="reportPage" class="page hidden">
+            <div class="p-4">
+                <!-- 日期選擇器 -->
+                <div class="bg-white rounded-lg p-4 card-shadow mb-4">
+                    <div class="flex justify-between items-center">
+                        <h3 class="font-bold">營運報表</h3>
+                        <select class="border rounded px-3 py-1 text-sm">
+                            <option>今日</option>
+                            <option>本週</option>
+                            <option>本月</option>
+                            <option>自訂</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- 關鍵指標 -->
+                <div class="grid grid-cols-2 gap-3 mb-4">
+                    <div class="bg-white p-4 rounded-lg card-shadow">
+                        <p class="text-sm text-gray-500 mb-1">進貨成本</p>
+                        <p class="text-2xl font-bold">$45,280</p>
+                        <p class="text-xs text-green-600 mt-1">↓ 8% vs 上期</p>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg card-shadow">
+                        <p class="text-sm text-gray-500 mb-1">浪費金額</p>
+                        <p class="text-2xl font-bold text-red-600">$2,150</p>
+                        <p class="text-xs text-red-600 mt-1">↑ 12% vs 上期</p>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg card-shadow">
+                        <p class="text-sm text-gray-500 mb-1">庫存週轉率</p>
+                        <p class="text-2xl font-bold">3.5 次</p>
+                        <p class="text-xs text-green-600 mt-1">良好</p>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg card-shadow">
+                        <p class="text-sm text-gray-500 mb-1">節省時間</p>
+                        <p class="text-2xl font-bold">2.5 hr</p>
+                        <p class="text-xs text-blue-600 mt-1">AI 自動化</p>
+                    </div>
+                </div>
+
+                <!-- 圖表區域 -->
+                <div class="bg-white rounded-lg p-4 card-shadow mb-4">
+                    <h4 class="font-bold mb-4">本週進貨趨勢</h4>
+                    <div class="h-48 flex items-end justify-between px-2">
+                        <div class="bg-blue-500 w-12 rounded-t" style="height: 60%;">
+                            <p class="text-xs text-center mt-2">一</p>
+                        </div>
+                        <div class="bg-blue-500 w-12 rounded-t" style="height: 80%;">
+                            <p class="text-xs text-center mt-2">二</p>
+                        </div>
+                        <div class="bg-blue-500 w-12 rounded-t" style="height: 45%;">
+                            <p class="text-xs text-center mt-2">三</p>
+                        </div>
+                        <div class="bg-blue-500 w-12 rounded-t" style="height: 70%;">
+                            <p class="text-xs text-center mt-2">四</p>
+                        </div>
+                        <div class="bg-blue-500 w-12 rounded-t" style="height: 90%;">
+                            <p class="text-xs text-center mt-2">五</p>
+                        </div>
+                        <div class="bg-blue-500 w-12 rounded-t" style="height: 100%;">
+                            <p class="text-xs text-center mt-2">六</p>
+                        </div>
+                        <div class="bg-gray-300 w-12 rounded-t" style="height: 30%;">
+                            <p class="text-xs text-center mt-2">日</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI 洞察 -->
+                <div class="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-4 border border-blue-200">
+                    <h4 class="font-bold mb-3 flex items-center">
+                        <i class="fas fa-robot text-blue-600 mr-2"></i>
+                        AI 洞察建議
+                    </h4>
+                    <div class="space-y-2 text-sm">
+                        <div class="flex items-start">
+                            <i class="fas fa-lightbulb text-yellow-500 mt-1 mr-2"></i>
+                            <p>高麗菜庫存過多，建議推出特價促銷或製作泡菜延長保存</p>
+                        </div>
+                        <div class="flex items-start">
+                            <i class="fas fa-chart-line text-green-500 mt-1 mr-2"></i>
+                            <p>週五進貨量較大，建議分批進貨降低浪費風險</p>
+                        </div>
+                        <div class="flex items-start">
+                            <i class="fas fa-exclamation-circle text-red-500 mt-1 mr-2"></i>
+                            <p>豬肉週轉率偏低，建議減少每次進貨量</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 導出按鈕 -->
+                <button class="w-full mt-4 bg-blue-600 text-white py-3 rounded-lg font-medium">
+                    <i class="fas fa-download mr-2"></i>
+                    導出 PDF 報表
+                </button>
+            </div>
+        </div>
+
+        <!-- 設定頁面 -->
+        <div id="settingsPage" class="page hidden">
+            <div class="p-4">
+                <!-- 商店資訊 -->
+                <div class="bg-white rounded-lg p-4 card-shadow mb-4">
+                    <h3 class="font-bold mb-4">商店資訊</h3>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="text-sm text-gray-600">商店名稱</label>
+                            <input type="text" value="王小明餐廳" class="w-full p-2 border rounded mt-1">
+                        </div>
+                        <div>
+                            <label class="text-sm text-gray-600">聯絡電話</label>
+                            <input type="tel" value="0912-345-678" class="w-full p-2 border rounded mt-1">
+                        </div>
+                        <div>
+                            <label class="text-sm text-gray-600">地址</label>
+                            <input type="text" value="台北市大安區信義路100號" class="w-full p-2 border rounded mt-1">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 提醒設定 -->
+                <div class="bg-white rounded-lg p-4 card-shadow mb-4">
+                    <h3 class="font-bold mb-4">提醒設定</h3>
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <p class="font-medium">效期提醒</p>
+                                <p class="text-sm text-gray-500">提前幾天提醒</p>
+                            </div>
+                            <select class="border rounded px-3 py-1">
+                                <option>3 天</option>
+                                <option>5 天</option>
+                                <option>7 天</option>
+                            </select>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <p class="font-medium">庫存警戒</p>
+                                <p class="text-sm text-gray-500">低於安全庫存時提醒</p>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" checked>
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <p class="font-medium">每日報表</p>
+                                <p class="text-sm text-gray-500">每晚 9 點自動生成</p>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" checked>
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI 設定 -->
+                <div class="bg-white rounded-lg p-4 card-shadow mb-4">
+                    <h3 class="font-bold mb-4">AI 助手設定</h3>
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <p class="font-medium">語音辨識語言</p>
+                                <p class="text-sm text-gray-500">選擇您常用的語言</p>
+                            </div>
+                            <select class="border rounded px-3 py-1">
+                                <option>中文(台灣)</option>
+                                <option>中文(大陸)</option>
+                                <option>台語</option>
+                            </select>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <p class="font-medium">智慧建議</p>
+                                <p class="text-sm text-gray-500">AI 主動提供營運建議</p>
+                            </div>
+                            <label class="switch">
+                                <input type="checkbox" checked>
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 關於 -->
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <div class="text-center">
+                        <h4 class="font-bold mb-2">百立 AI 進銷存</h4>
+                        <p class="text-sm text-gray-600">版本 1.0.0</p>
+                        <p class="text-xs text-gray-500 mt-2">© 2024 百立顧問</p>
+                    </div>
+                    <div class="mt-4 space-y-2">
+                        <button class="w-full py-2 text-blue-600 text-sm">使用教學</button>
+                        <button class="w-full py-2 text-blue-600 text-sm">聯絡客服</button>
+                        <button class="w-full py-2 text-red-600 text-sm">登出</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 語音輸入彈窗 -->
+    <div id="voiceModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg p-6 max-w-sm w-full">
+            <h3 class="font-bold text-lg mb-4">語音進貨</h3>
+            
+            <!-- 錄音按鈕 -->
+            <div class="text-center mb-4">
+                <button id="recordBtn" onclick="toggleRecording()" class="w-32 h-32 rounded-full bg-blue-500 text-white text-5xl hover:bg-blue-600 transition">
+                    <i class="fas fa-microphone"></i>
+                </button>
+                <p class="mt-2 text-sm text-gray-500">點擊開始錄音</p>
+            </div>
+
+            <!-- 錄音中的動畫 -->
+            <div id="recordingIndicator" class="hidden text-center mb-4">
+                <div class="flex justify-center items-center">
+                    <span class="voice-wave"></span>
+                    <span class="voice-wave"></span>
+                    <span class="voice-wave"></span>
+                    <span class="voice-wave"></span>
+                    <span class="voice-wave"></span>
+                </div>
+                <p class="text-sm text-red-600 mt-2">正在錄音中...</p>
+            </div>
+
+            <!-- 語音轉文字結果 -->
+            <div id="voiceResult" class="hidden">
+                <div class="bg-gray-50 p-3 rounded mb-4">
+                    <p class="text-sm text-gray-600 mb-1">您說的是：</p>
+                    <p id="voiceText" class="font-medium">高麗菜5箱，每箱500元，豬肉10斤，每斤120元</p>
+                </div>
+
+                <!-- AI 解析結果 -->
+                <div class="space-y-2 mb-4">
+                    <p class="text-sm font-bold">AI 解析結果：</p>
+                    <div class="border rounded p-2">
+                        <div class="flex justify-between text-sm">
+                            <span>高麗菜</span>
+                            <span>5 箱</span>
+                            <span>$2,500</span>
+                        </div>
+                    </div>
+                    <div class="border rounded p-2">
+                        <div class="flex justify-between text-sm">
+                            <span>豬肉</span>
+                            <span>10 斤</span>
+                            <span>$1,200</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 按鈕 -->
+            <div class="flex gap-2">
+                <button onclick="closeVoiceModal()" class="flex-1 py-2 border rounded text-gray-600">取消</button>
+                <button id="confirmBtn" onclick="confirmVoiceInput()" class="flex-1 py-2 bg-blue-600 text-white rounded hidden">確認進貨</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 拍照輸入彈窗 -->
+    <div id="photoModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg p-6 max-w-sm w-full">
+            <h3 class="font-bold text-lg mb-4">拍照進貨</h3>
+            
+            <!-- 相機預覽區 -->
+            <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center mb-4">
+                <i class="fas fa-camera text-6xl text-gray-300 mb-4"></i>
+                <p class="text-gray-500">點擊拍攝送貨單</p>
+                <input type="file" accept="image/*" capture="camera" class="hidden" id="cameraInput">
+                <button onclick="document.getElementById('cameraInput').click()" class="mt-4 px-4 py-2 bg-green-500 text-white rounded">
+                    開啟相機
+                </button>
+            </div>
+
+            <!-- 按鈕 -->
+            <div class="flex gap-2">
+                <button onclick="closePhotoModal()" class="flex-1 py-2 border rounded text-gray-600">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 手動輸入彈窗 -->
+    <div id="manualModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg p-6 max-w-sm w-full">
+            <h3 class="font-bold text-lg mb-4">手動輸入進貨</h3>
+            
+            <!-- 輸入表單 -->
+            <div class="space-y-3 mb-4">
+                <div>
+                    <label class="text-sm text-gray-600">品名</label>
+                    <input type="text" placeholder="例如：高麗菜" class="w-full p-2 border rounded mt-1">
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="text-sm text-gray-600">數量</label>
+                        <input type="number" placeholder="5" class="w-full p-2 border rounded mt-1">
+                    </div>
+                    <div>
+                        <label class="text-sm text-gray-600">單位</label>
+                        <select class="w-full p-2 border rounded mt-1">
+                            <option>箱</option>
+                            <option>斤</option>
+                            <option>包</option>
+                            <option>盒</option>
+                            <option>瓶</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label class="text-sm text-gray-600">單價</label>
+                    <input type="number" placeholder="500" class="w-full p-2 border rounded mt-1">
+                </div>
+                <div>
+                    <label class="text-sm text-gray-600">保存期限</label>
+                    <input type="date" class="w-full p-2 border rounded mt-1">
+                </div>
+            </div>
+
+            <!-- 按鈕 -->
+            <div class="flex gap-2">
+                <button onclick="closeManualModal()" class="flex-1 py-2 border rounded text-gray-600">取消</button>
+                <button onclick="confirmManualInput()" class="flex-1 py-2 bg-orange-600 text-white rounded">確認進貨</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部導航 -->
+    <div class="bottom-nav">
+        <div class="grid grid-cols-5 h-16">
+            <button onclick="showPage('dashboard')" class="flex flex-col items-center justify-center text-blue-600" id="navDashboard">
+                <i class="fas fa-home text-xl"></i>
+                <span class="text-xs mt-1">首頁</span>
+            </button>
+            <button onclick="showPage('inventory')" class="flex flex-col items-center justify-center text-gray-500" id="navInventory">
+                <i class="fas fa-plus-circle text-xl"></i>
+                <span class="text-xs mt-1">進貨</span>
+            </button>
+            <button onclick="showPage('stock')" class="flex flex-col items-center justify-center text-gray-500" id="navStock">
+                <i class="fas fa-boxes text-xl"></i>
+                <span class="text-xs mt-1">庫存</span>
+            </button>
+            <button onclick="showPage('report')" class="flex flex-col items-center justify-center text-gray-500" id="navReport">
+                <i class="fas fa-chart-bar text-xl"></i>
+                <span class="text-xs mt-1">報表</span>
+            </button>
+            <button onclick="showPage('settings')" class="flex flex-col items-center justify-center text-gray-500" id="navSettings">
+                <i class="fas fa-cog text-xl"></i>
+                <span class="text-xs mt-1">設定</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        // 頁面切換
+        function showPage(pageName) {
+            // 隱藏所有頁面
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.add('hidden');
+            });
+            
+            // 顯示選中的頁面
+            document.getElementById(pageName + 'Page').classList.remove('hidden');
+            
+            // 更新導航欄樣式
+            document.querySelectorAll('[id^="nav"]').forEach(nav => {
+                nav.classList.remove('text-blue-600');
+                nav.classList.add('text-gray-500');
+            });
+            document.getElementById('nav' + pageName.charAt(0).toUpperCase() + pageName.slice(1)).classList.add('text-blue-600');
+            document.getElementById('nav' + pageName.charAt(0).toUpperCase() + pageName.slice(1)).classList.remove('text-gray-500');
+        }
+
+        // 語音輸入相關
+        let isRecording = false;
+        
+        function showVoiceInput() {
+            document.getElementById('voiceModal').classList.remove('hidden');
+        }
+        
+        function closeVoiceModal() {
+            document.getElementById('voiceModal').classList.add('hidden');
+            document.getElementById('voiceResult').classList.add('hidden');
+            document.getElementById('recordingIndicator').classList.add('hidden');
+            document.getElementById('confirmBtn').classList.add('hidden');
+            isRecording = false;
+        }
+        
+        function toggleRecording() {
+            const recordBtn = document.getElementById('recordBtn');
+            const recordingIndicator = document.getElementById('recordingIndicator');
+            const voiceResult = document.getElementById('voiceResult');
+            const confirmBtn = document.getElementById('confirmBtn');
+            
+            if (!isRecording) {
+                // 開始錄音
+                isRecording = true;
+                recordBtn.classList.add('recording');
+                recordingIndicator.classList.remove('hidden');
+                
+                // 模擬錄音3秒後自動停止
+                setTimeout(() => {
+                    if (isRecording) {
+                        // 停止錄音
+                        isRecording = false;
+                        recordBtn.classList.remove('recording');
+                        recordingIndicator.classList.add('hidden');
+                        voiceResult.classList.remove('hidden');
+                        confirmBtn.classList.remove('hidden');
+                    }
+                }, 3000);
+            } else {
+                // 手動停止錄音
+                isRecording = false;
+                recordBtn.classList.remove('recording');
+                recordingIndicator.classList.add('hidden');
+                voiceResult.classList.remove('hidden');
+                confirmBtn.classList.remove('hidden');
+            }
+        }
+        
+        function confirmVoiceInput() {
+            alert('進貨資料已儲存！');
+            closeVoiceModal();
+            // 重新載入頁面或更新資料
+            location.reload();
+        }
+
+        // 拍照輸入
+        function showPhotoInput() {
+            document.getElementById('photoModal').classList.remove('hidden');
+        }
+        
+        function closePhotoModal() {
+            document.getElementById('photoModal').classList.add('hidden');
+        }
+
+        // 手動輸入
+        function showManualInput() {
+            document.getElementById('manualModal').classList.remove('hidden');
+        }
+        
+        function closeManualModal() {
+            document.getElementById('manualModal').classList.add('hidden');
+        }
+        
+        function confirmManualInput() {
+            alert('進貨資料已儲存！');
+            closeManualModal();
+            // 重新載入頁面或更新資料
+            location.reload();
+        }
+
+        // 處理相機輸入
+        document.getElementById('cameraInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                // 這裡可以加入圖片預覽和 AI 辨識的邏輯
+                alert('照片已上傳，AI 正在辨識中...');
+                setTimeout(() => {
+                    alert('辨識完成！發現 3 項商品');
+                    closePhotoModal();
+                }, 2000);
+            }
+        });
+    </script>
+
+    <!-- CSS for toggle switch -->
+    <style>
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+        
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+        }
+        
+        input:checked + .slider {
+            background-color: #2196F3;
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        
+        .slider.round {
+            border-radius: 24px;
+        }
+        
+        .slider.round:before {
+            border-radius: 50%;
+        }
+    </style>
+</body>
+</html>
