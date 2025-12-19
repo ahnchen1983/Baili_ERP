@@ -22,6 +22,16 @@
             background-color: #ef4444;
         }
         
+        /* AI 助手按鈕動畫 */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .animate-float {
+            animation: float 3s ease-in-out infinite;
+        }
+        
         /* 底部導航欄固定 */
         .bottom-nav {
             position: fixed;
@@ -62,6 +72,23 @@
             0%, 100% { transform: scaleY(1); }
             50% { transform: scaleY(2); }
         }
+        
+        /* AI 助手面板陰影 */
+        #aiAssistantPanel {
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+        }
+        
+        /* 打字機效果 */
+        @keyframes typing {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+        
+        .typing-effect {
+            overflow: hidden;
+            white-space: nowrap;
+            animation: typing 2s steps(40, end);
+        }
     </style>
 </head>
 <body class="bg-gray-50">
@@ -83,15 +110,69 @@
     <div class="main-content">
         <!-- 首頁/儀表板 -->
         <div id="dashboardPage" class="page">
-            <!-- 效期警示（最重要的放最上面） -->
-            <div class="m-4 bg-red-50 border-l-4 border-red-500 p-4 rounded-r animate-pulse-red">
+            <!-- AI 智慧洞察區塊（新增 - 最顯眼的位置） -->
+            <div class="bg-gradient-to-r from-purple-600 to-blue-600 text-white p-4 m-4 rounded-xl card-shadow">
+                <div class="flex items-center mb-3">
+                    <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center mr-3">
+                        <i class="fas fa-robot text-purple-600"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold">AI 智慧助手</h3>
+                        <p class="text-xs opacity-90">Powered by Google Gemini</p>
+                    </div>
+                </div>
+                <div class="space-y-2 text-sm">
+                    <div class="bg-white/20 backdrop-blur rounded-lg p-2">
+                        💡 <span class="font-medium">今日建議：</span>明天週末，建議增加豬肉備貨量 20%
+                    </div>
+                    <div class="bg-white/20 backdrop-blur rounded-lg p-2">
+                        📊 <span class="font-medium">營運洞察：</span>本週蔬菜類銷售增長 35%，可考慮推出蔬食套餐
+                    </div>
+                    <div class="bg-white/20 backdrop-blur rounded-lg p-2">
+                        ⚠️ <span class="font-medium">風險預警：</span>高麗菜庫存過多，建議今日特價促銷
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI 功能展示卡片（新增） -->
+            <div class="px-4 mb-4">
+                <h3 class="font-bold mb-3 text-gray-700 flex items-center">
+                    <span class="bg-purple-100 text-purple-600 px-2 py-1 rounded text-xs mr-2">AI 賦能</span>
+                    智慧營運功能
+                </h3>
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="bg-gradient-to-br from-blue-50 to-purple-50 p-3 rounded-lg border border-purple-200">
+                        <i class="fas fa-pen-fancy text-purple-600 text-xl mb-2"></i>
+                        <p class="font-medium text-sm">AI 文案生成</p>
+                        <p class="text-xs text-gray-600 mt-1">自動產生行銷文案與社群貼文</p>
+                    </div>
+                    <div class="bg-gradient-to-br from-green-50 to-blue-50 p-3 rounded-lg border border-green-200">
+                        <i class="fas fa-utensils text-green-600 text-xl mb-2"></i>
+                        <p class="font-medium text-sm">菜單優化建議</p>
+                        <p class="text-xs text-gray-600 mt-1">根據庫存與銷售數據推薦</p>
+                    </div>
+                    <div class="bg-gradient-to-br from-orange-50 to-red-50 p-3 rounded-lg border border-orange-200">
+                        <i class="fas fa-chart-line text-orange-600 text-xl mb-2"></i>
+                        <p class="font-medium text-sm">營運趨勢分析</p>
+                        <p class="text-xs text-gray-600 mt-1">預測銷售與智慧補貨建議</p>
+                    </div>
+                    <div class="bg-gradient-to-br from-pink-50 to-purple-50 p-3 rounded-lg border border-pink-200">
+                        <i class="fas fa-box-open text-pink-600 text-xl mb-2"></i>
+                        <p class="font-medium text-sm">進貨種類推薦</p>
+                        <p class="text-xs text-gray-600 mt-1">季節性商品與熱門食材</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 效期警示（調整樣式） -->
+            <div class="mx-4 mb-4 bg-red-50 border-l-4 border-red-500 p-3 rounded-r">
                 <div class="flex items-center justify-between">
                     <div>
-                        <h3 class="font-bold text-red-700 flex items-center">
+                        <h3 class="font-bold text-red-700 flex items-center text-sm">
                             <i class="fas fa-exclamation-triangle mr-2"></i>
-                            效期警示
+                            AI 效期警示
                         </h3>
-                        <div class="mt-2 space-y-1 text-sm">
+                        <div class="mt-2 space-y-1 text-xs">
                             <div class="flex justify-between">
                                 <span>🥬 高麗菜</span>
                                 <span class="text-red-600 font-bold">剩 2 天（3 箱）</span>
@@ -102,52 +183,58 @@
                             </div>
                         </div>
                     </div>
-                    <div class="text-3xl">⏰</div>
+                    <button class="bg-red-100 text-red-700 px-3 py-1 rounded text-xs">
+                        AI 處理建議
+                    </button>
                 </div>
             </div>
 
-            <!-- 快速操作按鈕 -->
+            <!-- 快速操作按鈕（調整樣式） -->
             <div class="grid grid-cols-3 gap-3 px-4 mb-4">
-                <button onclick="showVoiceInput()" class="bg-blue-500 text-white p-4 rounded-lg card-shadow">
-                    <i class="fas fa-microphone text-2xl mb-2"></i>
+                <button onclick="showVoiceInput()" class="bg-blue-500 text-white p-3 rounded-lg card-shadow relative">
+                    <span class="absolute -top-1 -right-1 bg-purple-600 text-xs px-1 rounded">AI</span>
+                    <i class="fas fa-microphone text-xl mb-1"></i>
                     <p class="text-xs">語音進貨</p>
                 </button>
-                <button onclick="showPhotoInput()" class="bg-green-500 text-white p-4 rounded-lg card-shadow">
-                    <i class="fas fa-camera text-2xl mb-2"></i>
+                <button onclick="showPhotoInput()" class="bg-green-500 text-white p-3 rounded-lg card-shadow relative">
+                    <span class="absolute -top-1 -right-1 bg-purple-600 text-xs px-1 rounded">AI</span>
+                    <i class="fas fa-camera text-xl mb-1"></i>
                     <p class="text-xs">拍照進貨</p>
                 </button>
-                <button onclick="showManualInput()" class="bg-orange-500 text-white p-4 rounded-lg card-shadow">
-                    <i class="fas fa-keyboard text-2xl mb-2"></i>
+                <button onclick="showManualInput()" class="bg-orange-500 text-white p-3 rounded-lg card-shadow">
+                    <i class="fas fa-keyboard text-xl mb-1"></i>
                     <p class="text-xs">手動輸入</p>
                 </button>
             </div>
 
-            <!-- 今日數據卡片 -->
+            <!-- 今日數據卡片（加入 AI 預測） -->
             <div class="grid grid-cols-2 gap-4 px-4 mb-4">
-                <div class="bg-white p-4 rounded-lg card-shadow">
+                <div class="bg-white p-3 rounded-lg card-shadow">
                     <div class="flex items-center justify-between">
                         <div>
-                            <p class="text-gray-500 text-sm">今日進貨</p>
-                            <p class="text-2xl font-bold text-blue-600">$12,580</p>
+                            <p class="text-gray-500 text-xs">今日進貨</p>
+                            <p class="text-xl font-bold text-blue-600">$12,580</p>
                             <p class="text-xs text-green-600">↑ 15% vs 昨日</p>
+                            <p class="text-xs text-purple-600 mt-1">AI預測明日: $14,200</p>
                         </div>
-                        <i class="fas fa-shopping-cart text-blue-200 text-3xl"></i>
+                        <i class="fas fa-shopping-cart text-blue-200 text-2xl"></i>
                     </div>
                 </div>
-                <div class="bg-white p-4 rounded-lg card-shadow">
+                <div class="bg-white p-3 rounded-lg card-shadow">
                     <div class="flex items-center justify-between">
                         <div>
-                            <p class="text-gray-500 text-sm">庫存價值</p>
-                            <p class="text-2xl font-bold text-green-600">$85,200</p>
+                            <p class="text-gray-500 text-xs">庫存價值</p>
+                            <p class="text-xl font-bold text-green-600">$85,200</p>
                             <p class="text-xs text-gray-500">152 項商品</p>
+                            <p class="text-xs text-purple-600 mt-1">AI建議安全庫存: $75,000</p>
                         </div>
-                        <i class="fas fa-warehouse text-green-200 text-3xl"></i>
+                        <i class="fas fa-warehouse text-green-200 text-2xl"></i>
                     </div>
                 </div>
             </div>
 
-            <!-- 最近進貨記錄 -->
-            <div class="px-4">
+            <!-- 最近進貨記錄（加入 AI 標記） -->
+            <div class="px-4 pb-4">
                 <h3 class="font-bold mb-3 text-gray-700">最近進貨</h3>
                 <div class="space-y-2">
                     <div class="bg-white p-3 rounded-lg card-shadow flex justify-between items-center">
@@ -161,6 +248,7 @@
                         <div class="text-right">
                             <p class="font-bold">5 箱</p>
                             <p class="text-sm text-gray-500">$2,500</p>
+                            <span class="text-xs bg-purple-100 text-purple-600 px-2 py-0.5 rounded">AI 語音輸入</span>
                         </div>
                     </div>
                     <div class="bg-white p-3 rounded-lg card-shadow flex justify-between items-center">
@@ -174,6 +262,7 @@
                         <div class="text-right">
                             <p class="font-bold">10 斤</p>
                             <p class="text-sm text-gray-500">$1,200</p>
+                            <span class="text-xs bg-green-100 text-green-600 px-2 py-0.5 rounded">AI 拍照辨識</span>
                         </div>
                     </div>
                 </div>
@@ -558,6 +647,77 @@
         </div>
     </div>
 
+    <!-- AI 助手浮動按鈕（新增） -->
+    <div id="aiAssistantBtn" class="fixed bottom-24 right-4 z-40">
+        <button onclick="toggleAIAssistant()" class="bg-gradient-to-r from-purple-600 to-blue-600 text-white w-14 h-14 rounded-full shadow-lg flex items-center justify-center animate-bounce relative">
+            <i class="fas fa-robot text-2xl"></i>
+            <span class="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse"></span>
+        </button>
+        <p class="text-xs text-center mt-1 text-gray-600 font-medium">AI 助手</p>
+    </div>
+
+    <!-- AI 助手對話框（新增） -->
+    <div id="aiAssistantPanel" class="fixed bottom-24 right-4 w-80 bg-white rounded-xl shadow-2xl hidden z-50 max-h-96 overflow-hidden">
+        <div class="bg-gradient-to-r from-purple-600 to-blue-600 text-white p-4 rounded-t-xl">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                    <i class="fas fa-robot text-2xl mr-2"></i>
+                    <div>
+                        <h3 class="font-bold">AI 營運助手</h3>
+                        <p class="text-xs opacity-90">Google Gemini 技術支援</p>
+                    </div>
+                </div>
+                <button onclick="toggleAIAssistant()" class="text-white hover:text-gray-200">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+        
+        <div class="p-4 overflow-y-auto max-h-72">
+            <!-- AI 功能快捷按鈕 -->
+            <div class="grid grid-cols-2 gap-2 mb-4">
+                <button onclick="aiGenerateContent()" class="bg-purple-50 hover:bg-purple-100 text-purple-700 p-3 rounded-lg text-sm transition">
+                    <i class="fas fa-pen-fancy mb-1"></i>
+                    <p class="text-xs">生成行銷文案</p>
+                </button>
+                <button onclick="aiMenuSuggestion()" class="bg-green-50 hover:bg-green-100 text-green-700 p-3 rounded-lg text-sm transition">
+                    <i class="fas fa-utensils mb-1"></i>
+                    <p class="text-xs">菜單建議</p>
+                </button>
+                <button onclick="aiInventoryAnalysis()" class="bg-blue-50 hover:bg-blue-100 text-blue-700 p-3 rounded-lg text-sm transition">
+                    <i class="fas fa-box-open mb-1"></i>
+                    <p class="text-xs">進貨建議</p>
+                </button>
+                <button onclick="aiTrendAnalysis()" class="bg-orange-50 hover:bg-orange-100 text-orange-700 p-3 rounded-lg text-sm transition">
+                    <i class="fas fa-chart-line mb-1"></i>
+                    <p class="text-xs">營運分析</p>
+                </button>
+            </div>
+
+            <!-- 對話區域 -->
+            <div id="aiChatArea" class="space-y-3">
+                <div class="bg-gray-100 rounded-lg p-3 text-sm">
+                    <p class="font-medium mb-1">🤖 AI 助手</p>
+                    <p>您好！我是您的 AI 營運助手。我可以協助您：</p>
+                    <ul class="mt-2 space-y-1 text-xs text-gray-600">
+                        <li>• 撰寫行銷文案與社群貼文</li>
+                        <li>• 分析銷售趨勢並提供建議</li>
+                        <li>• 優化菜單組合與定價</li>
+                        <li>• 預測進貨需求避免浪費</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 輸入區域 -->
+            <div class="mt-4 flex gap-2">
+                <input type="text" id="aiInput" placeholder="詢問 AI 助手..." class="flex-1 p-2 border rounded-lg text-sm">
+                <button onclick="sendToAI()" class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- 語音輸入彈窗 -->
     <div id="voiceModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-lg p-6 max-w-sm w-full">
@@ -730,6 +890,92 @@
             });
             document.getElementById('nav' + pageName.charAt(0).toUpperCase() + pageName.slice(1)).classList.add('text-blue-600');
             document.getElementById('nav' + pageName.charAt(0).toUpperCase() + pageName.slice(1)).classList.remove('text-gray-500');
+        }
+
+        // AI 助手相關功能
+        function toggleAIAssistant() {
+            const panel = document.getElementById('aiAssistantPanel');
+            panel.classList.toggle('hidden');
+        }
+
+        function aiGenerateContent() {
+            const chatArea = document.getElementById('aiChatArea');
+            const userMsg = createMessage('user', '幫我寫一個今天的促銷貼文');
+            const aiMsg = createMessage('ai', '🎉【週五限定優惠】🎉\n\n親愛的顧客們，\n今日特別推薦「紅燒牛肉麵」買一送一！\n使用新鮮高麗菜與優質牛肉慢燉6小時\n湯頭濃郁，麵條Q彈，錯過可惜！\n\n📍 優惠時間：今日 11:00-14:00\n📱 外送請洽：0912-345-678\n\n#週五優惠 #紅燒牛肉麵 #買一送一');
+            chatArea.appendChild(userMsg);
+            setTimeout(() => chatArea.appendChild(aiMsg), 1000);
+            scrollToBottom();
+        }
+
+        function aiMenuSuggestion() {
+            const chatArea = document.getElementById('aiChatArea');
+            const userMsg = createMessage('user', '根據庫存給我菜單建議');
+            const aiMsg = createMessage('ai', '根據您的庫存分析，建議今日菜單：\n\n🔥 主推商品（庫存充足）：\n• 高麗菜豬肉水餃 - 庫存15箱高麗菜需優先使用\n• 香煎豬排套餐 - 豬肉庫存30斤\n\n⚠️ 限量供應（庫存較少）：\n• 牛肉類料理 - 庫存僅剩5斤\n\n💡 創新建議：\n推出「高麗菜泡菜」作為小菜，延長保存期限並增加附加價值');
+            chatArea.appendChild(userMsg);
+            setTimeout(() => chatArea.appendChild(aiMsg), 1000);
+            scrollToBottom();
+        }
+
+        function aiInventoryAnalysis() {
+            const chatArea = document.getElementById('aiChatArea');
+            const userMsg = createMessage('user', '分析進貨需求');
+            const aiMsg = createMessage('ai', '📊 進貨建議分析：\n\n🔴 緊急補貨：\n• 醬油 - 預計2天內用完\n• 白米 - 剩餘量僅夠3天\n\n🟡 計畫補貨：\n• 雞蛋 - 建議週一進貨20盒\n• 食用油 - 下週三前補充\n\n🟢 暫緩進貨：\n• 高麗菜 - 目前庫存過多\n• 調味料類 - 庫存充足\n\n根據歷史數據，週末營業額較高，建議週五下午完成補貨');
+            chatArea.appendChild(userMsg);
+            setTimeout(() => chatArea.appendChild(aiMsg), 1000);
+            scrollToBottom();
+        }
+
+        function aiTrendAnalysis() {
+            const chatArea = document.getElementById('aiChatArea');
+            const userMsg = createMessage('user', '分析本週營運趨勢');
+            const aiMsg = createMessage('ai', '📈 本週營運趨勢分析：\n\n營收表現：\n• 週營收 $126,500（↑12% vs 上週）\n• 平均客單價 $285（↑5%）\n• 來客數 444人（↑7%）\n\n關鍵發現：\n1. 週二至週四午餐時段成長20%\n2. 蔬食類餐點銷量提升35%\n3. 外送訂單佔比達到40%\n\n建議行動：\n• 增加週間午餐備料量\n• 開發更多蔬食選項\n• 優化外送包裝流程');
+            chatArea.appendChild(userMsg);
+            setTimeout(() => chatArea.appendChild(aiMsg), 1000);
+            scrollToBottom();
+        }
+
+        function sendToAI() {
+            const input = document.getElementById('aiInput');
+            const chatArea = document.getElementById('aiChatArea');
+            
+            if (input.value.trim()) {
+                const userMsg = createMessage('user', input.value);
+                chatArea.appendChild(userMsg);
+                
+                // 模擬 AI 回應
+                setTimeout(() => {
+                    const aiMsg = createMessage('ai', '正在分析您的問題...\n這個功能將連接 Google Gemini API 提供即時回應。');
+                    chatArea.appendChild(aiMsg);
+                    scrollToBottom();
+                }, 1000);
+                
+                input.value = '';
+            }
+        }
+
+        function createMessage(sender, text) {
+            const msgDiv = document.createElement('div');
+            msgDiv.className = sender === 'user' 
+                ? 'bg-blue-50 rounded-lg p-3 text-sm ml-8' 
+                : 'bg-gray-100 rounded-lg p-3 text-sm';
+            
+            const label = document.createElement('p');
+            label.className = 'font-medium mb-1';
+            label.innerHTML = sender === 'user' ? '👤 您' : '🤖 AI 助手';
+            
+            const content = document.createElement('p');
+            content.className = 'whitespace-pre-wrap';
+            content.textContent = text;
+            
+            msgDiv.appendChild(label);
+            msgDiv.appendChild(content);
+            
+            return msgDiv;
+        }
+
+        function scrollToBottom() {
+            const chatArea = document.getElementById('aiChatArea');
+            chatArea.scrollTop = chatArea.scrollHeight;
         }
 
         // 語音輸入相關
